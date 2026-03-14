@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KO II Beatmaking Fundamentals</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0E0E0E; --surface: #161616; --surface2: #1E1E1E; --surface3: #262626;
+      --text: #E0DAD0; --mid: #9A9288; --soft: #5A5550;
+      --accent: #E8693A; --accent-light: #F0936A; --accent-muted: rgba(232,105,58,0.15);
+      --teal: #3A9B9B; --teal-light: rgba(58,155,155,0.15);
+      --yellow: #D4A843; --yellow-muted: rgba(212,168,67,0.12);
+      --purple: #9B6BCC; --purple-muted: rgba(155,107,204,0.15); --purple-light: rgba(155,107,204,0.12);
+      --rule: #2A2A2A;
+      --nav-h: 56px; --mod-bar-h: 48px; --total-top: 104px;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+
+    /* ── TOP NAV ── */
+    .top-nav {
+      position: sticky; top: 0; z-index: 200;
+      height: var(--nav-h);
+      background: rgba(14,14,14,0.95); backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--rule);
+      display: flex; align-items: center; padding: 0 40px; gap: 32px;
+    }
+    .top-nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.92rem; letter-spacing: 0.04em; color: var(--text); white-space: nowrap; flex-shrink: 0; }
+    .top-nav-logo span { color: var(--accent); }
+
+    /* ── MODULE TAB BAR ── */
+    .mod-bar {
+      position: sticky; top: var(--nav-h); z-index: 190;
+      height: var(--mod-bar-h);
+      background: rgba(22,22,22,0.97); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--rule);
+      display: flex; align-items: stretch; padding: 0 40px; gap: 4px;
+      overflow-x: auto; scrollbar-width: none;
+    }
+    .mod-bar::-webkit-scrollbar { display: none; }
+    .mod-tab {
+      display: flex; align-items: center; gap: 8px;
+      padding: 0 16px; font-size: 0.78rem; white-space: nowrap;
+      font-family: 'DM Mono', monospace; letter-spacing: 0.06em;
+      color: var(--soft); cursor: pointer; border: none; background: none;
+      border-bottom: 2px solid transparent; transition: color 0.15s, border-color 0.15s;
+      position: relative; top: 1px;
+    }
+    .mod-tab:hover { color: var(--mid); }
+    .mod-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .mod-tab-num { opacity: 0.5; font-size: 0.65rem; }
+    .mod-tab.locked { opacity: 0.35; cursor: default; }
+    .mod-tab.locked:hover { color: var(--soft); }
+    .coming-soon {
+      font-family: 'DM Mono', monospace; font-size: 0.55rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--soft); background: var(--surface2);
+      border: 1px solid var(--rule); border-radius: 3px; padding: 1px 5px;
+    }
+
+    /* ── MODULE SECTIONS ── */
+    .module-section { display: none; }
+    .module-section.active { display: block; }
+
+    /* ── MODULE HERO ── */
+    .mod-hero { border-bottom: 1px solid var(--rule); padding: 56px 64px; background: var(--surface); position: relative; overflow: hidden; }
+    .mod-hero::after { position: absolute; right: 48px; top: 50%; transform: translateY(-50%); font-family: 'Syne', sans-serif; font-size: 12rem; font-weight: 800; line-height: 1; pointer-events: none; opacity: 0.055; }
+    .m1-hero::after { content: '01'; color: var(--accent); }
+    .m2-hero::after { content: '02'; color: var(--teal); }
+    .mod-tag { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+    .m2 .mod-tag { color: var(--teal); }
+    .mod-tag::before { content: ''; display: block; width: 18px; height: 2px; background: currentColor; }
+    .mod-hero h1 { font-family: 'Syne', sans-serif; font-size: clamp(1.9rem, 3.5vw, 3rem); font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 14px; max-width: 600px; }
+    .mod-hero p { font-size: 0.95rem; color: var(--mid); line-height: 1.7; max-width: 520px; }
+    .mod-meta { display: flex; gap: 36px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--rule); flex-wrap: wrap; }
+    .meta-item { display: flex; flex-direction: column; gap: 3px; }
+    .meta-label { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--soft); }
+    .meta-val { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700; color: var(--text); }
+
+    /* ── PAGE BODY ── */
+    .page-body { display: grid; grid-template-columns: 240px 1fr; }
+
+    /* ── SIDEBAR ── */
+    .sidebar { border-right: 1px solid var(--rule); padding: 28px 0; background: var(--surface); position: sticky; top: var(--total-top); height: calc(100vh - var(--total-top)); overflow-y: auto; }
+    .sidebar-label { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--soft); padding: 0 22px; margin-bottom: 8px; }
+    .sidebar-link { display: flex; align-items: flex-start; gap: 10px; padding: 9px 22px; font-size: 0.82rem; color: var(--mid); text-decoration: none; transition: all 0.15s; border-left: 2px solid transparent; line-height: 1.4; cursor: pointer; }
+    .sidebar-link:hover { color: var(--text); background: var(--surface2); }
+    .sidebar-link.active { color: var(--accent); border-left-color: var(--accent); background: var(--accent-muted); }
+    .m2 .sidebar-link.active { color: var(--teal); border-left-color: var(--teal); background: var(--teal-light); }
+    .m3 .mod-tag { color: var(--purple); }
+    .m3 .lesson-eyebrow { color: var(--purple); }
+    .m3 .step-n { background: var(--purple-muted); border-color: rgba(155,107,204,0.3); color: var(--purple); }
+    .m3 .sidebar-link.active { color: var(--purple); border-left-color: var(--purple); background: var(--purple-light); }
+    .m3-hero::after { content: '03'; color: var(--purple); }
+    .sidebar-num { font-family: 'DM Mono', monospace; font-size: 0.6rem; color: var(--soft); min-width: 20px; padding-top: 2px; flex-shrink: 0; }
+
+    /* ── CONTENT ── */
+    .content { padding: 52px 64px; max-width: 800px; }
+
+    /* ── LESSON ── */
+    .lesson { margin-bottom: 80px; scroll-margin-top: calc(var(--total-top) + 20px); }
+    .lesson-header { margin-bottom: 24px; padding-bottom: 18px; border-bottom: 1px solid var(--rule); }
+    .lesson-eyebrow { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 7px; }
+    .m2 .lesson-eyebrow { color: var(--teal); }
+    .lesson h2 { font-family: 'Syne', sans-serif; font-size: 1.55rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 9px; }
+    .lesson-intro { font-size: 0.91rem; color: var(--mid); line-height: 1.74; }
+
+    /* ── BLOCKS ── */
+    .block { margin-bottom: 18px; }
+    .block-label { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--soft); margin-bottom: 9px; display: flex; align-items: center; gap: 8px; }
+    .block-label::before { content: ''; display: block; width: 10px; height: 1px; background: var(--soft); }
+    .block-body { font-size: 0.9rem; color: var(--mid); line-height: 1.78; }
+
+    /* ── STEPS ── */
+    .steps { display: flex; flex-direction: column; gap: 7px; }
+    .step { display: flex; gap: 12px; padding: 12px 15px; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; }
+    .step-n { width: 23px; height: 23px; flex-shrink: 0; border-radius: 50%; background: var(--accent-muted); border: 1px solid rgba(232,105,58,0.25); display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; font-size: 0.63rem; color: var(--accent); }
+    .m2 .step-n { background: var(--teal-light); border-color: rgba(58,155,155,0.3); color: var(--teal); }
+    .step-body { font-size: 0.86rem; line-height: 1.68; color: var(--mid); padding-top: 1px; }
+    .step-body strong { color: var(--text); font-weight: 500; }
+
+    /* ── KBD ── */
+    .kbd { display: inline-block; font-family: 'DM Mono', monospace; font-size: 0.7rem; background: var(--surface3); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 1px 6px; color: var(--accent-light); letter-spacing: 0.03em; white-space: nowrap; }
+
+    /* ── PATTERN REF ── */
+    .pattern-ref { background: var(--surface); border: 1px solid var(--rule); border-left: 3px solid var(--teal); border-radius: 11px; padding: 20px 22px; }
+    .pattern-song { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.92rem; color: var(--text); margin-bottom: 2px; }
+    .pattern-meta { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--teal); margin-bottom: 14px; }
+    .pattern-grid { margin-bottom: 12px; }
+    .pattern-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+    .pattern-name { font-family: 'DM Mono', monospace; font-size: 0.63rem; color: var(--soft); width: 34px; flex-shrink: 0; text-align: right; }
+    .pattern-steps { display: flex; gap: 3px; }
+    .step-cell { width: 17px; height: 17px; border-radius: 3px; background: var(--surface2); border: 1px solid var(--rule); }
+    .step-cell.on { background: var(--teal); border-color: var(--teal); }
+    .step-cell.on-soft { background: rgba(58,155,155,0.4); border-color: var(--teal); }
+    .step-group { display: flex; gap: 3px; }
+    .step-group + .step-group { margin-left: 5px; }
+    .beat-labels { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+    .beat-label-pad { width: 34px; flex-shrink: 0; }
+    .beat-label-nums { display: flex; gap: 3px; }
+    .beat-num-group { display: flex; gap: 3px; }
+    .beat-num-group + .beat-num-group { margin-left: 5px; }
+    .beat-num { width: 17px; font-family: 'DM Mono', monospace; font-size: 0.48rem; color: var(--soft); text-align: center; }
+    .beat-num.downbeat { color: var(--mid); }
+    .pattern-notes { font-size: 0.83rem; color: var(--mid); line-height: 1.68; }
+    .pattern-notes strong { color: var(--text); font-weight: 500; }
+
+    /* ── TIP / WATCHOUT ── */
+    .tip { background: var(--accent-muted); border: 1px solid rgba(232,105,58,0.18); border-radius: 8px; padding: 13px 17px; display: flex; gap: 10px; }
+    .tip-icon, .watchout-icon { font-size: 0.9rem; flex-shrink: 0; margin-top: 1px; }
+    .tip-body { font-size: 0.84rem; color: var(--mid); line-height: 1.66; }
+    .tip-body strong { color: var(--accent-light); font-weight: 500; }
+    .watchout { background: var(--yellow-muted); border: 1px solid rgba(212,168,67,0.2); border-radius: 8px; padding: 13px 17px; display: flex; gap: 10px; }
+    .watchout-body { font-size: 0.84rem; color: var(--mid); line-height: 1.66; }
+    .watchout-body strong { color: var(--yellow); font-weight: 500; }
+
+    /* ── EXERCISE ── */
+    .exercise { background: var(--surface2); border: 1px solid var(--rule); border-top: 2px solid var(--teal); border-radius: 10px; padding: 20px 24px; }
+    .exercise-eyebrow { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--teal); margin-bottom: 8px; display: flex; align-items: center; gap: 7px; }
+    .exercise-eyebrow::before { content: '▶'; font-size: 0.5rem; }
+    .exercise h4 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.94rem; color: var(--text); margin-bottom: 6px; }
+    .exercise p { font-size: 0.84rem; color: var(--mid); line-height: 1.7; margin-bottom: 11px; }
+    .exercise ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+    .exercise ul li { font-size: 0.82rem; color: var(--mid); padding-left: 15px; position: relative; line-height: 1.56; }
+    .exercise ul li::before { content: '→'; position: absolute; left: 0; color: var(--teal); font-size: 0.74rem; top: 1px; }
+
+    /* ── DIVIDERS & NEXT ── */
+    .lesson-divider { border: none; border-top: 1px solid var(--rule); margin: 60px 0; }
+    .next-module { margin-top: 64px; padding: 26px 30px; background: var(--surface); border: 1px solid var(--rule); border-radius: 11px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
+    .next-module:hover { border-color: rgba(232,105,58,0.35); background: var(--surface2); }
+    .next-up { font-family: 'DM Mono', monospace; font-size: 0.61rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--soft); margin-bottom: 4px; }
+    .next-title { font-family: 'Syne', sans-serif; font-size: 1.05rem; font-weight: 700; color: var(--text); }
+    .next-arrow { font-size: 1.25rem; color: var(--accent); }
+
+    /* ── FADE ── */
+    .fade-up { opacity: 0; transform: translateY(14px); transition: opacity 0.45s ease, transform 0.45s ease; }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 860px) {
+      .page-body { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .content { padding: 32px 20px; }
+      .mod-hero { padding: 44px 20px; }
+      .mod-hero::after { display: none; }
+      .top-nav { padding: 0 20px; }
+      .mod-bar { padding: 0 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════
+     TOP NAV
+════════════════════════════════════════════════════════ -->
+<nav class="top-nav">
+  <div class="top-nav-logo"><span>KO II</span> Beatmaking Fundamentals</div>
+</nav>
+
+<!-- ══════════════════════════════════════════════════════
+     MODULE TAB BAR
+════════════════════════════════════════════════════════ -->
+<div class="mod-bar" id="modBar">
+  <button class="mod-tab active" data-mod="m1"><span class="mod-tab-num">01</span> Hardware &amp; Patterns</button>
+  <button class="mod-tab" data-mod="m2"><span class="mod-tab-num">02</span> Sampling</button>
+  <button class="mod-tab" data-mod="m3"><span class="mod-tab-num">03</span> Beat Making</button>
+  <button class="mod-tab locked" data-mod="m4"><span class="mod-tab-num">04</span> Effects <span class="coming-soon">Soon</span></button>
+  <button class="mod-tab locked" data-mod="m5"><span class="mod-tab-num">05</span> Workflow <span class="coming-soon">Soon</span></button>
+  <button class="mod-tab locked" data-mod="m6"><span class="mod-tab-num">06</span> Arrangement <span class="coming-soon">Soon</span></button>
+</div>
+
+
+<!-- ██████████████████████████████████████████████████████
+     MODULE 01 — Hardware Overview & Core Patterns
+█████████████████████████████████████████████████████████ -->
+<section class="module-section m1 active" id="m1">
+
+  <div class="mod-hero m1-hero">
+    <div class="mod-tag">Module 01 of 06</div>
+    <h1>Hardware Overview<br/>&amp; Core Patterns</h1>
+    <p>A fast map of the EP-133's controls, then straight into the essential drum patterns that built electronic music — translated directly to the device in front of you.</p>
+    <div class="mod-meta">
+      <div class="meta-item"><span class="meta-label">Lessons</span><span class="meta-val">5</span></div>
+      <div class="meta-item"><span class="meta-label">Focus</span><span class="meta-val">Controls · Patterns · Navigation</span></div>
+      <div class="meta-item"><span class="meta-label">Level</span><span class="meta-val">Foundation</span></div>
+    </div>
+  </div>
+
+  <div class="page-body">
+    <aside class="sidebar" id="sidebar-m1">
+      <div class="sidebar-label">Lessons</div>
+      <a class="sidebar-link active" data-target="m1-l1">
+        <span class="sidebar-num">1.1</span>Controls Reference
+      </a>
+      <a class="sidebar-link" data-target="m1-l2">
+        <span class="sidebar-num">1.2</span>Groups, Patterns &amp; Scenes
+      </a>
+      <a class="sidebar-link" data-target="m1-l3">
+        <span class="sidebar-num">1.3</span>The Four-on-the-Floor
+      </a>
+      <a class="sidebar-link" data-target="m1-l4">
+        <span class="sidebar-num">1.4</span>Adding the Snare &amp; Hi-Hat
+      </a>
+      <a class="sidebar-link" data-target="m1-l5">
+        <span class="sidebar-num">1.5</span>Your First Variation
+      </a>
+    </aside>
+
+    <main class="content">
+
+      <!-- 1.1 -->
+      <div class="lesson fade-up" id="m1-l1">
+        <div class="lesson-header">
+          <div class="lesson-eyebrow">Lesson 1.1</div>
+          <h2>Controls Reference</h2>
+          <p class="lesson-intro">Everything you need to know about the physical layout — fast. Refer back here when something's unclear later.</p>
+        </div>
+        <div class="block">
+          <div class="block-label">The Controls</div>
+          <div class="steps">
+            <div class="step"><div class="step-n">■</div><div class="step-body"><strong>12 pads</strong> — play sounds, enter steps, type numbers. Pressure sensitive: hit harder for a louder hit. The labels printed above them change meaning depending on which mode button you're holding.</div></div>
+            <div class="step"><div class="step-n">■</div><div class="step-body"><strong>Groups A–D</strong> — four independent lanes. Think A = drums, B = bass, C = chords, D = extras. Each holds 99 patterns and 12 sounds. All four play simultaneously.</div></div>
+            <div class="step"><div class="step-n">■</div><div class="step-body"><strong>– and +</strong> — navigate steps, patterns, scenes, and most menus. Hold a group button + press – / + to switch patterns within that group.</div></div>
+            <div class="step"><div class="step-n">■</div><div class="step-body"><strong>Knob X / Knob Y</strong> — context-sensitive. What they adjust depends on the active mode. Hold <span class="kbd">SHIFT</span> while turning for finer control.</div></div>
+            <div class="step"><div class="step-n">■</div><div class="step-body"><strong>Fader</strong> — group volume by default. Hold <span class="kbd">FADER</span> and tap a pad to reassign it. Labels above the pads show the options.</div></div>
+            <div class="step"><div class="step-n">■</div><div class="step-body"><strong>Shift</strong> — secondary functions on almost every button. If something isn't working as expected, check whether you need to add or remove Shift.</div></div>
+            <div class="step"><div class="step-n">■</div><div class="step-body"><strong>Main</strong> — home. Press it from anywhere to return to the top-level project view. Safe to press at any time.</div></div>
+            <div class="step"><div class="step-n">■</div><div class="step-body"><strong>Commit</strong> — duplicates the current scene and steps into it, leaving the original untouched. The most important creative button on the device.</div></div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">The Display</div>
+          <div class="block-body">The 3-character readout shows values and short mode labels — <span class="kbd">128</span> = current BPM, <span class="kbd">A01</span> = Group A Pattern 1, <span class="kbd">S03</span> = Scene 3. The backlit icons surrounding it give context: which icon is lit tells you what the number refers to. When in doubt, look at which icon is active before turning a knob.</div>
+        </div>
+        <div class="block">
+          <div class="block-label">Watch Out</div>
+          <div class="watchout">
+            <div class="watchout-icon">⚠️</div>
+            <div class="watchout-body"><strong>Knob X and Y do different things in different modes.</strong> There's no fixed answer to "what does Knob X do?" — it always depends on context. The display and icons tell you what's active before you turn anything.</div>
+          </div>
+        </div>
+      </div>
+
+      <hr class="lesson-divider"/>
+
+      <!-- 1.2 -->
+      <div class="lesson fade-up" id="m1-l2">
+        <div class="lesson-header">
+          <div class="lesson-eyebrow">Lesson 1.2</div>
+          <h2>Groups, Patterns &amp; Scenes</h2>
+          <p class="lesson-intro">The three-level hierarchy that everything on the EP-133 is built around. Get this mental model clear and nothing about the device will confuse you.</p>
+        </div>
+        <div class="block">
+          <div class="block-label">The Hierarchy</div>
+          <div class="steps">
+            <div class="step"><div class="step-n">1</div><div class="step-body"><strong>Pattern</strong> — a looping sequence of notes for one group. Group A might have Pattern 1 = main drum loop, Pattern 2 = breakdown version. Each group has 99 patterns.</div></div>
+            <div class="step"><div class="step-n">2</div><div class="step-body"><strong>Scene</strong> — a snapshot of which pattern is playing in each group simultaneously. Scene 1: A-P1 + B-P1 + C-P1. Scene 2: A-P1 + B-P1 + C-P2 (chord variation). Up to 99 scenes.</div></div>
+            <div class="step"><div class="step-n">3</div><div class="step-body"><strong>Project</strong> — the whole thing. All groups, all patterns, all scenes. Up to 9 projects on the device. One project = one track or one idea.</div></div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Navigating</div>
+          <div class="steps">
+            <div class="step"><div class="step-n">→</div><div class="step-body">Switch patterns within a group: <strong>hold the Group button + press – or +</strong>.</div></div>
+            <div class="step"><div class="step-n">→</div><div class="step-body">Switch scenes: <strong>hold Main + press – or +</strong>. Or hold Main and tap a numbered pad to jump directly.</div></div>
+            <div class="step"><div class="step-n">→</div><div class="step-body">Undo: <strong>Shift + Group B</strong>. The umbrella icon lights when undo is available.</div></div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Tip</div>
+          <div class="tip">
+            <div class="tip-icon">💡</div>
+            <div class="tip-body"><strong>Patterns vs Scenes is the most common early confusion.</strong> Switching patterns (hold Group + –/+) only changes that one group. Switching scenes (hold Main + –/+) changes all four groups at once. Know which you're doing before pressing.</div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Practice</div>
+          <div class="exercise">
+            <div class="exercise-eyebrow">Exercise 1.2</div>
+            <h4>Navigate Without Breaking Anything</h4>
+            <p>Pure navigation — no recording. Build the muscle memory now.</p>
+            <ul>
+              <li>Hold Group A + press + three times → you're on Pattern 4. Press – to return to Pattern 1.</li>
+              <li>Hold Main + press + twice → Scene 3. Hold Main + tap pad 1 → back to Scene 1.</li>
+              <li>Press Shift + Group B → Undo. Does the umbrella icon appear?</li>
+              <li>Press Main → confirm you're back at the home view.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <hr class="lesson-divider"/>
+
+      <!-- 1.3 -->
+      <div class="lesson fade-up" id="m1-l3">
+        <div class="lesson-header">
+          <div class="lesson-eyebrow">Lesson 1.3</div>
+          <h2>The Four-on-the-Floor</h2>
+          <p class="lesson-intro">Every house and techno track starts here. A kick on every beat, 16 steps per bar. Program this until it's instant.</p>
+        </div>
+        <div class="block">
+          <div class="block-label">Real-World Reference</div>
+          <div class="pattern-ref">
+            <div class="pattern-song">Around the World — Daft Punk (1997)</div>
+            <div class="pattern-meta">Virgin Records · French House · 121 BPM</div>
+            <div class="pattern-grid">
+              <div class="beat-labels">
+                <div class="beat-label-pad"></div>
+                <div class="beat-label-nums">
+                  <div class="beat-num-group"><div class="beat-num downbeat">1</div><div class="beat-num">e</div><div class="beat-num">+</div><div class="beat-num">a</div></div>
+                  <div class="beat-num-group"><div class="beat-num downbeat">2</div><div class="beat-num">e</div><div class="beat-num">+</div><div class="beat-num">a</div></div>
+                  <div class="beat-num-group"><div class="beat-num downbeat">3</div><div class="beat-num">e</div><div class="beat-num">+</div><div class="beat-num">a</div></div>
+                  <div class="beat-num-group"><div class="beat-num downbeat">4</div><div class="beat-num">e</div><div class="beat-num">+</div><div class="beat-num">a</div></div>
+                </div>
+              </div>
+              <div class="pattern-row">
+                <div class="pattern-name">KICK</div>
+                <div class="pattern-steps">
+                  <div class="step-group"><div class="step-cell on"></div><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell on"></div><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell on"></div><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell on"></div><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div></div>
+                </div>
+              </div>
+            </div>
+            <div class="pattern-notes">
+              <strong>Steps active: 1, 5, 9, 13</strong> — one kick per quarter note, four per bar. "Around the World" runs this pattern for almost seven minutes straight and never gets boring, because everything else around it is doing the work. When you program your first four-on-the-floor on the EP-133, you're using the exact rhythmic idea that anchors one of the most-played dance records ever made.
+            </div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">How to Program It</div>
+          <div class="steps">
+            <div class="step"><div class="step-n">1</div><div class="step-body">Press <span class="kbd">Group A</span> to select the drum group. Press <span class="kbd">PLAY</span> to start the sequencer looping.</div></div>
+            <div class="step"><div class="step-n">2</div><div class="step-body">Hold <span class="kbd">RECORD</span> — tap your kick pad on every beat as the loop plays. Four evenly-spaced hits per bar.</div></div>
+            <div class="step"><div class="step-n">3</div><div class="step-body">Release <span class="kbd">RECORD</span>. Listen back. The kick should land rock-solid on every beat.</div></div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Tip</div>
+          <div class="tip">
+            <div class="tip-icon">💡</div>
+            <div class="tip-body"><strong>Record one element at a time.</strong> Don't try to play everything in one take. Record just the kick, listen, then layer the next element on the following pass. This gives you much more control and prevents timing mistakes from stacking up.</div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Practice</div>
+          <div class="exercise">
+            <div class="exercise-eyebrow">Exercise 1.3</div>
+            <h4>Lock the Kick</h4>
+            <p>Set BPM to 128. Record a four-on-the-floor kick until you can do it in one take with no timing wobble. This is the foundation everything else sits on.</p>
+            <ul>
+              <li>Set BPM to 128 using Knob X in Main mode</li>
+              <li>Record four kick hits per bar, perfectly on the beat</li>
+              <li>Let it loop — does every hit feel equally spaced?</li>
+              <li>If any hit sounds off, hold <span class="kbd">ERASE</span> + tap the kick pad to clear and re-record</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <hr class="lesson-divider"/>
+
+      <!-- 1.4 -->
+      <div class="lesson fade-up" id="m1-l4">
+        <div class="lesson-header">
+          <div class="lesson-eyebrow">Lesson 1.4</div>
+          <h2>Adding the Snare &amp; Hi-Hat</h2>
+          <p class="lesson-intro">Two more elements and you have a complete groove. The relationship between kick, snare, and hi-hat is the foundation of every drum pattern you'll ever make.</p>
+        </div>
+        <div class="block">
+          <div class="block-label">Real-World Reference</div>
+          <div class="pattern-ref">
+            <div class="pattern-song">Windowlicker — Aphex Twin (1999)</div>
+            <div class="pattern-meta">Warp Records · Electronic / IDM · 130 BPM</div>
+            <div class="pattern-grid">
+              <div class="beat-labels">
+                <div class="beat-label-pad"></div>
+                <div class="beat-label-nums">
+                  <div class="beat-num-group"><div class="beat-num downbeat">1</div><div class="beat-num">e</div><div class="beat-num">+</div><div class="beat-num">a</div></div>
+                  <div class="beat-num-group"><div class="beat-num downbeat">2</div><div class="beat-num">e</div><div class="beat-num">+</div><div class="beat-num">a</div></div>
+                  <div class="beat-num-group"><div class="beat-num downbeat">3</div><div class="beat-num">e</div><div class="beat-num">+</div><div class="beat-num">a</div></div>
+                  <div class="beat-num-group"><div class="beat-num downbeat">4</div><div class="beat-num">e</div><div class="beat-num">+</div><div class="beat-num">a</div></div>
+                </div>
+              </div>
+              <div class="pattern-row">
+                <div class="pattern-name">KICK</div>
+                <div class="pattern-steps">
+                  <div class="step-group"><div class="step-cell on"></div><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell on"></div><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell on"></div><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell on"></div><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div></div>
+                </div>
+              </div>
+              <div class="pattern-row">
+                <div class="pattern-name">SNARE</div>
+                <div class="pattern-steps">
+                  <div class="step-group"><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell on"></div><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell on"></div><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div></div>
+                </div>
+              </div>
+              <div class="pattern-row">
+                <div class="pattern-name">H.HAT</div>
+                <div class="pattern-steps">
+                  <div class="step-group"><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell on"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell on"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell on"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell on"></div><div class="step-cell"></div></div>
+                </div>
+              </div>
+            </div>
+            <div class="pattern-notes">
+              <strong>Kick: 1, 5, 9, 13 · Snare: 5, 13 · Hi-hat: 3, 7, 11, 15</strong><br/>
+              This three-element chassis sits underneath Aphex Twin's most rhythmic work, including Windowlicker. Richard James then layers wildly complex percussion and glitching textures on top of it. The lesson: start with a foundation this solid and you have room to go anywhere. Program this pattern, let it loop, and listen — it already sounds like music before you add another thing.
+            </div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">How to Add Snare &amp; Hat</div>
+          <div class="steps">
+            <div class="step"><div class="step-n">1</div><div class="step-body">With your kick loop playing, hold <span class="kbd">RECORD</span> and tap your snare pad on beats 2 and 4 — steps 5 and 13 in the 16-step grid.</div></div>
+            <div class="step"><div class="step-n">2</div><div class="step-body">Release <span class="kbd">RECORD</span>. Listen. Kick and snare together should feel like a locked groove.</div></div>
+            <div class="step"><div class="step-n">3</div><div class="step-body">Hold <span class="kbd">RECORD</span> again and add hi-hats on the offbeats — the "and" of each beat. Steps 3, 7, 11, 15.</div></div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Watch Out</div>
+          <div class="watchout">
+            <div class="watchout-icon">⚠️</div>
+            <div class="watchout-body"><strong>Live recording overdubs by default.</strong> Each pass adds to what's already there. To clear a specific pad's notes, hold <span class="kbd">ERASE</span> and tap that pad during playback. Hold Erase + pad while stopped to clear the whole track.</div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Practice</div>
+          <div class="exercise">
+            <div class="exercise-eyebrow">Exercise 1.4</div>
+            <h4>Full Three-Element Groove</h4>
+            <p>Build the complete kick/snare/hat pattern in three separate recording passes.</p>
+            <ul>
+              <li>Pass 1: kick on every beat. Listen back.</li>
+              <li>Pass 2: snare on beats 2 and 4 only. Listen back.</li>
+              <li>Pass 3: hi-hats on the offbeats between each kick. Listen back.</li>
+              <li>Add a single open hi-hat hit on step 8 (the "and" of beat 2) — notice how one extra hit changes the feel.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <hr class="lesson-divider"/>
+
+      <!-- 1.5 -->
+      <div class="lesson fade-up" id="m1-l5">
+        <div class="lesson-header">
+          <div class="lesson-eyebrow">Lesson 1.5</div>
+          <h2>Your First Variation with Commit</h2>
+          <p class="lesson-intro">A loop isn't a track. Commit is how you build structure on the EP-133 — duplicating a scene to create a variation without touching the original.</p>
+        </div>
+        <div class="block">
+          <div class="block-label">Real-World Reference</div>
+          <div class="pattern-ref">
+            <div class="pattern-song">DARE — Gorillaz (2005)</div>
+            <div class="pattern-meta">Parlophone · Alternative / Electronic · 122 BPM</div>
+            <div class="pattern-grid">
+              <div class="beat-labels">
+                <div class="beat-label-pad"></div>
+                <div class="beat-label-nums">
+                  <div class="beat-num-group"><div class="beat-num downbeat">1</div><div class="beat-num">e</div><div class="beat-num">+</div><div class="beat-num">a</div></div>
+                  <div class="beat-num-group"><div class="beat-num downbeat">2</div><div class="beat-num">e</div><div class="beat-num">+</div><div class="beat-num">a</div></div>
+                  <div class="beat-num-group"><div class="beat-num downbeat">3</div><div class="beat-num">e</div><div class="beat-num">+</div><div class="beat-num">a</div></div>
+                  <div class="beat-num-group"><div class="beat-num downbeat">4</div><div class="beat-num">e</div><div class="beat-num">+</div><div class="beat-num">a</div></div>
+                </div>
+              </div>
+              <div class="pattern-row">
+                <div class="pattern-name">KICK</div>
+                <div class="pattern-steps">
+                  <div class="step-group"><div class="step-cell on"></div><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell on"></div><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell on"></div><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell on"></div><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div></div>
+                </div>
+              </div>
+              <div class="pattern-row">
+                <div class="pattern-name">SNARE</div>
+                <div class="pattern-steps">
+                  <div class="step-group"><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell on"></div><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell on"></div><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div></div>
+                </div>
+              </div>
+              <div class="pattern-row">
+                <div class="pattern-name">H.HAT</div>
+                <div class="pattern-steps">
+                  <div class="step-group"><div class="step-cell on"></div><div class="step-cell"></div><div class="step-cell on"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell on"></div><div class="step-cell"></div><div class="step-cell on"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell on"></div><div class="step-cell"></div><div class="step-cell on"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell on"></div><div class="step-cell"></div><div class="step-cell on-soft"></div><div class="step-cell"></div></div>
+                </div>
+              </div>
+            </div>
+            <div class="pattern-notes">
+              <strong>Kick: 1, 5, 9, 13 · Snare: 5, 13 · Hi-hat: every 8th note with step 15 at lower velocity</strong><br/>
+              "DARE" is built on a driving 8th-note hi-hat where the lighter ghost hit before beat 4 stops the pattern feeling mechanical. Damon Albarn and Danger Mouse used scene-switching to build the whole track structure — intro stripped back, chorus layered, breakdown removed. That's exactly what you're about to do with Commit.
+            </div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Using Commit to Build Structure</div>
+          <div class="steps">
+            <div class="step"><div class="step-n">1</div><div class="step-body">With your full groove in Scene 1, press <span class="kbd">COMMIT</span>. Display increments to Scene 2 — an exact copy. Your original is untouched.</div></div>
+            <div class="step"><div class="step-n">2</div><div class="step-body">In Scene 2, erase the hi-hat: hold <span class="kbd">ERASE</span> + tap your hi-hat pad. Kick and snare remain. This is your breakdown.</div></div>
+            <div class="step"><div class="step-n">3</div><div class="step-body">Press <span class="kbd">COMMIT</span> again → Scene 3. Re-record hi-hats. Scene 1 = full, Scene 2 = breakdown, Scene 3 = rebuild. That's a track arc.</div></div>
+            <div class="step"><div class="step-n">4</div><div class="step-body">Switch scenes live: <span class="kbd">MAIN</span> + pad number. The switch happens cleanly at the next bar boundary.</div></div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Tip</div>
+          <div class="tip">
+            <div class="tip-icon">💡</div>
+            <div class="tip-body"><strong>Make Commit a reflex.</strong> Whenever you think "I want to try something different" — press Commit first, then make the change. You'll always have the previous version exactly one scene back.</div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Practice</div>
+          <div class="exercise">
+            <div class="exercise-eyebrow">Exercise 1.5</div>
+            <h4>Three-Scene Mini Track</h4>
+            <p>Build a minimal track structure using only Commit and Erase. No new sounds needed.</p>
+            <ul>
+              <li>Scene 1: full groove — kick, snare, hi-hat</li>
+              <li>Commit → Scene 2: erase hi-hat only. Kick + snare breakdown.</li>
+              <li>Commit → Scene 3: add hi-hat back. Optionally add one extra snare hit on step 15.</li>
+              <li>Playback running: switch 1 → 2 → 3 → 1 using Main + pad number</li>
+              <li>Notice where the switch feels natural vs abrupt — that's your arrangement ear developing</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-module" onclick="switchModule('m2')">
+        <div>
+          <div class="next-up">Up Next — Module 02</div>
+          <div class="next-title">Sampling Basics</div>
+        </div>
+        <div class="next-arrow">→</div>
+      </div>
+
+    </main>
+  </div>
+</section>
+
+
+<!-- ██████████████████████████████████████████████████████
+     MODULE 02 — Sampling Basics
+█████████████████████████████████████████████████████████ -->
+<section class="module-section m2" id="m2">
+
+  <div class="mod-hero m2-hero">
+    <div class="mod-tag">Module 02 of 06</div>
+    <h1>Sampling<br/>Basics</h1>
+    <p>The EP-133 is a sampler before everything else. This module covers how sound gets in, how you shape it, and how it ends up on a pad — ready to be played.</p>
+    <div class="mod-meta">
+      <div class="meta-item"><span class="meta-label">Lessons</span><span class="meta-val">5</span></div>
+      <div class="meta-item"><span class="meta-label">Focus</span><span class="meta-val">Recording · Trimming · Playback</span></div>
+      <div class="meta-item"><span class="meta-label">Level</span><span class="meta-val">Foundation</span></div>
+    </div>
+  </div>
+
+  <div class="page-body">
+    <aside class="sidebar m2" id="sidebar-m2">
+      <div class="sidebar-label">Lessons</div>
+      <a class="sidebar-link active" data-target="m2-l1"><span class="sidebar-num">2.1</span>How Sampling Works on the EP-133</a>
+      <a class="sidebar-link" data-target="m2-l2"><span class="sidebar-num">2.2</span>Recording from the Mic &amp; Line-In</a>
+      <a class="sidebar-link" data-target="m2-l3"><span class="sidebar-num">2.3</span>Trimming &amp; Setting Loop Points</a>
+      <a class="sidebar-link" data-target="m2-l4"><span class="sidebar-num">2.4</span>Assigning Samples to Pads</a>
+      <a class="sidebar-link" data-target="m2-l5"><span class="sidebar-num">2.5</span>Playback Modes &amp; Pitch</a>
+    </aside>
+
+    <main class="content m2">
+
+      <!-- 2.1 -->
+      <div class="lesson fade-up" id="m2-l1">
+        <div class="lesson-header">
+          <div class="lesson-eyebrow">Lesson 2.1</div>
+          <h2>How Sampling Works on the EP-133</h2>
+          <p class="lesson-intro">Before you record a single sound, understand the path it takes — from source, through the device, onto a pad. This mental model prevents most beginner confusion.</p>
+        </div>
+        <div class="block">
+          <div class="block-label">Explanation</div>
+          <div class="block-body">Sampling on the EP-133 is a three-step process: <strong>record</strong> audio into one of 999 sample slots, <strong>trim</strong> it to exactly the portion you want, then <strong>assign</strong> it to a pad so it plays back when tapped. The device has 128MB of onboard memory shared across all 999 slots — more than enough for a full track's worth of material. Audio can come from two sources: the <strong>built-in microphone</strong> (pointing upward along the top edge) or the <strong>3.5mm line input</strong>. When a cable is plugged into the input, it takes priority over the mic automatically. Samples are stored in the device's memory even after power off — they persist until you delete them or load a new project.</div>
+        </div>
+        <div class="block">
+          <div class="block-label">The Sample Flow</div>
+          <div class="steps">
+            <div class="step"><div class="step-n">1</div><div class="step-body"><strong>Source</strong> — mic (ambient sound, singing, beatboxing, foley) or line-in (records, phones, synths, other hardware). Choose based on what you're capturing.</div></div>
+            <div class="step"><div class="step-n">2</div><div class="step-body"><strong>Record</strong> — press <span class="kbd">SAMPLE</span> to enter sample mode, then hold <span class="kbd">RECORD</span> to capture audio. The EP-133 records into a buffer first, giving you the option to trim before committing.</div></div>
+            <div class="step"><div class="step-n">3</div><div class="step-body"><strong>Trim</strong> — use the <span class="kbd">–</span> and <span class="kbd">+</span> buttons along with Knob X/Y to set the start and end points. This is where you isolate the exact hit, loop, or phrase you want.</div></div>
+            <div class="step"><div class="step-n">4</div><div class="step-body"><strong>Assign</strong> — tap a pad to assign the trimmed sample to it. That pad now plays your sample. It will stay assigned until you overwrite it.</div></div>
+            <div class="step"><div class="step-n">5</div><div class="step-body"><strong>Play</strong> — the assigned pad plays the sample at its natural pitch and length when tapped. Velocity and pressure change how it plays. Further tweaks (pitch, loop mode, FX) come in later modules.</div></div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Real-World Reference</div>
+          <div class="pattern-ref">
+            <div class="pattern-song">Music Has the Right to Children — Boards of Canada (1998)</div>
+            <div class="pattern-meta">Warp Records · Electronic / Ambient · Various BPM</div>
+            <div class="pattern-notes">
+              Boards of Canada built their entire early catalogue by recording ambient sounds — degraded cassette recordings, found audio, field recordings, childhood home movies — trimming them to usable fragments, and building hypnotic loops from the results. "Music Has the Right to Children" is essentially a sampling masterclass disguised as an album. The EP-133's workflow of record → trim → assign mirrors exactly what they were doing with far more cumbersome equipment. The difference is your source material. Start with whatever's around you: your voice, a window opening, a kettle boiling, a finger snapping. The process is identical no matter what you record.
+            </div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Tip</div>
+          <div class="tip">
+            <div class="tip-icon">💡</div>
+            <div class="tip-body"><strong>Record longer than you need, then trim down.</strong> It's much easier to trim a sample shorter than to re-record because you cut off too early. When in doubt, start recording a beat before the sound begins and stop a beat after it ends. You can always trim the excess.</div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Watch Out</div>
+          <div class="watchout">
+            <div class="watchout-icon">⚠️</div>
+            <div class="watchout-body"><strong>Sample slots are per-group, per-sound.</strong> Each group (A–D) has 12 sound slots (one per pad). When you assign a sample to pad 3 in Group A, it replaces whatever was there before. If you're using factory sounds and want to keep them, assign your new samples to empty slots in a different group or pattern.</div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Practice</div>
+          <div class="exercise">
+            <div class="exercise-eyebrow">Exercise 2.1</div>
+            <h4>Trace the Signal Path</h4>
+            <p>Before recording anything, walk through the sample flow in your head with a concrete example.</p>
+            <ul>
+              <li>Decide: what will you record first? A clap? Your voice? Something in the room?</li>
+              <li>Decide: mic or line-in? Is a cable plugged into the input?</li>
+              <li>Navigate to Sample mode — press <span class="kbd">SAMPLE</span>. What does the display show?</li>
+              <li>Without recording yet, identify: which pad will you assign this sample to?</li>
+              <li>Write down or remember: Source → Record → Trim → Assign → Play. That's the whole loop.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <hr class="lesson-divider"/>
+
+      <!-- 2.2 -->
+      <div class="lesson fade-up" id="m2-l2">
+        <div class="lesson-header">
+          <div class="lesson-eyebrow">Lesson 2.2</div>
+          <h2>Recording from the Mic &amp; Line-In</h2>
+          <p class="lesson-intro">Getting clean audio into the EP-133 is a skill in itself. Input level, mic placement, and source selection each affect the quality of everything you sample.</p>
+        </div>
+        <div class="block">
+          <div class="block-label">Explanation</div>
+          <div class="block-body">The EP-133's built-in microphone is an upward-facing omnidirectional mic — it hears everything around it, not just what's directly above. This makes it great for capturing ambient textures and room sounds, but it also means background noise easily bleeds in. For cleaner recordings of specific sounds, get the device as close to the source as possible, or use the line-in instead. The line input accepts a 3.5mm stereo signal and gives you a much cleaner, isolated capture — ideal for sampling from a phone, record player, or synthesizer. Input level is critical: too low = noisy sample; too high = digital clipping. Watch the level indicator on the display and aim for peaks in the upper-middle range.</div>
+        </div>
+        <div class="block">
+          <div class="block-label">Step-by-Step — Recording a Sample</div>
+          <div class="steps">
+            <div class="step"><div class="step-n">1</div><div class="step-body">Press <span class="kbd">SAMPLE</span> to enter sample mode. The display confirms you're ready to record.</div></div>
+            <div class="step"><div class="step-n">2</div><div class="step-body">If using line-in: plug your source into the 3.5mm input jack. Set your source volume to around 70% to start.</div></div>
+            <div class="step"><div class="step-n">3</div><div class="step-body">Hold <span class="kbd">RECORD</span> to begin capturing. Make your sound — speak, clap, play the source. Release <span class="kbd">RECORD</span> when done.</div></div>
+            <div class="step"><div class="step-n">4</div><div class="step-body">The EP-133 immediately shows you the captured audio. Press <span class="kbd">PLAY</span> to audition what you recorded before trimming.</div></div>
+            <div class="step"><div class="step-n">5</div><div class="step-body">If the level is too quiet or too loud, press <span class="kbd">ERASE</span> to discard and re-record. Adjust your source volume or mic distance and try again.</div></div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Real-World Reference</div>
+          <div class="pattern-ref">
+            <div class="pattern-song">Demon Days — Gorillaz (2005)</div>
+            <div class="pattern-meta">Parlophone · Alternative / Hip-Hop / Electronic · Various BPM</div>
+            <div class="pattern-notes">
+              Danger Mouse assembled "Demon Days" using a combination of live recordings and sampled material — some captured cleanly in the studio, others deliberately lo-fi and degraded. Tracks like "Feel Good Inc." layer tightly recorded bass and vocals against grainy, textured samples. The contrast between clean and dirty sources is intentional and expressive. On the EP-133, you have the same choice: the line-in gives you studio-clean capture, the mic gives you roomy, imperfect texture. Neither is wrong. The question is which serves the sound you're building.
+            </div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Tip</div>
+          <div class="tip">
+            <div class="tip-icon">💡</div>
+            <div class="tip-body"><strong>For mic recordings, cup your hands around the device.</strong> The EP-133's mic picks up everything — including reflections off your desk. Holding the device up and cupping both hands loosely around it blocks reflections and focuses the mic toward whatever's in front of you, giving noticeably cleaner results in live environments.</div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Watch Out</div>
+          <div class="watchout">
+            <div class="watchout-icon">⚠️</div>
+            <div class="watchout-body"><strong>Clipping sounds bad and can't be fixed after recording.</strong> A clipped sample has a harsh, crackling distortion on loud transients that no amount of trimming or processing will remove. If your recording sounds harsh or distorted on playback, the input level was too hot. Discard it, lower the source volume, and re-record.</div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Practice</div>
+          <div class="exercise">
+            <div class="exercise-eyebrow">Exercise 2.2</div>
+            <h4>Your First Three Samples</h4>
+            <p>Record three sounds using the built-in mic. Don't worry about what they are — focus on getting clean, unclipped recordings each time.</p>
+            <ul>
+              <li>Sample 1: a hand clap directly in front of the mic. Check for clipping.</li>
+              <li>Sample 2: your voice — say any word. Check the level. Was it too quiet? Too loud?</li>
+              <li>Sample 3: an ambient sound from the room. Let the mic capture whatever's there for 3 seconds.</li>
+              <li>Audition each one using Play. Which sounds cleanest? Which has the most character?</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <hr class="lesson-divider"/>
+
+      <!-- 2.3 -->
+      <div class="lesson fade-up" id="m2-l3">
+        <div class="lesson-header">
+          <div class="lesson-eyebrow">Lesson 2.3</div>
+          <h2>Trimming &amp; Setting Loop Points</h2>
+          <p class="lesson-intro">A raw recording is just raw material. Trimming is where you turn it into something usable — cutting out silence, isolating the exact hit, and deciding whether it loops.</p>
+        </div>
+        <div class="block">
+          <div class="block-label">Explanation</div>
+          <div class="block-body">After recording, the EP-133 puts you directly into trim mode. You see a waveform representation on the display and use <span class="kbd">–</span> / <span class="kbd">+</span> along with <strong>Knob X</strong> (start point) and <strong>Knob Y</strong> (end point) to define exactly which portion of the recording plays back. The start point is critical for percussive sounds: any silence before the transient makes pads feel sluggish and unresponsive. Trim it tight to the very beginning of the sound. For loops — a phrase you want to repeat seamlessly — the end point needs to align cleanly so the loop doesn't stutter or click at the join. This takes practice and a careful ear.</div>
+        </div>
+        <div class="block">
+          <div class="block-label">Step-by-Step — Trimming a One-Shot</div>
+          <div class="steps">
+            <div class="step"><div class="step-n">1</div><div class="step-body">After recording, you're automatically in trim view. Press <span class="kbd">PLAY</span> to hear the full raw recording with current start/end points.</div></div>
+            <div class="step"><div class="step-n">2</div><div class="step-body">Turn <strong>Knob X</strong> to move the <strong>start point</strong> — push it right until the leading silence is eliminated. The sound should begin the instant the pad is tapped.</div></div>
+            <div class="step"><div class="step-n">3</div><div class="step-body">Turn <strong>Knob Y</strong> to move the <strong>end point</strong> — pull it left to cut off any trailing silence or unwanted sound after the hit.</div></div>
+            <div class="step"><div class="step-n">4</div><div class="step-body">Press <span class="kbd">PLAY</span> again to audition the trimmed result. Repeat adjustments until the sample plays exactly as intended.</div></div>
+            <div class="step"><div class="step-n">5</div><div class="step-body">Tap a pad to assign the trimmed sample. Done — it's now live on that pad.</div></div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Real-World Reference</div>
+          <div class="pattern-ref">
+            <div class="pattern-song">Come to Daddy — Aphex Twin (1997)</div>
+            <div class="pattern-meta">Warp Records · Electronic / Industrial · Various BPM</div>
+            <div class="pattern-notes">
+              Aphex Twin's approach to sampling was notoriously surgical — sounds trimmed to single-millisecond precision, transients sharpened, loops cut so tightly they feel like they breathe. "Come to Daddy" layers organic vocal fragments against processed percussion, and the precision of those edits is what makes it feel so unsettling. Even at its most chaotic, the underlying sample work is extremely exact. Good trimming is invisible — you only notice bad trimming (the click, the gap, the late start). Get your start points tight, and the rest of the creative work has a solid foundation.
+            </div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Tip</div>
+          <div class="tip">
+            <div class="tip-icon">💡</div>
+            <div class="tip-body"><strong>For loops, listen for clicks at the join point.</strong> A click means the waveform doesn't land at zero-crossing at the end — the audio is abruptly cut. Move the end point slightly in either direction using <span class="kbd">SHIFT</span> + Knob Y for fine adjustment until the click disappears and the loop seams seamlessly.</div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Watch Out</div>
+          <div class="watchout">
+            <div class="watchout-icon">⚠️</div>
+            <div class="watchout-body"><strong>Don't trim too aggressively on sounds with a slow attack.</strong> Pads, chords, and sustained sounds often have a gentle fade-in at the start. If you trim too tight on these, you'll cut off the beginning of the sound and it'll feel harsh. Give slow-attack sounds a little breathing room at the start point.</div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Practice</div>
+          <div class="exercise">
+            <div class="exercise-eyebrow">Exercise 2.3</div>
+            <h4>The Tight Trim Challenge</h4>
+            <p>Record a hand clap and trim it as tightly as possible. The goal: zero gap between pad tap and sound.</p>
+            <ul>
+              <li>Record a sharp hand clap using the mic</li>
+              <li>In trim mode, push the start point right until just before the transient spike</li>
+              <li>Assign it to a pad and tap it repeatedly — does it feel instant?</li>
+              <li>If there's any delay before the sound, trim the start point tighter</li>
+              <li>Now try on a longer sound (a hummed note) — where would you set the end point to make it feel musical?</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <hr class="lesson-divider"/>
+
+      <!-- 2.4 -->
+      <div class="lesson fade-up" id="m2-l4">
+        <div class="lesson-header">
+          <div class="lesson-eyebrow">Lesson 2.4</div>
+          <h2>Assigning Samples to Pads</h2>
+          <p class="lesson-intro">The pad layout is your instrument. How you arrange samples across the 12 pads — and across the four groups — determines how naturally you can perform and build patterns.</p>
+        </div>
+        <div class="block">
+          <div class="block-label">Explanation</div>
+          <div class="block-body">Each group (A–D) has 12 pads, each of which holds one sample. Assignment is simple: after trimming, tap the pad you want the sample on. But thinking about <em>which</em> pad to assign it to is worth a moment's thought. Convention on the EP-133 is to put drums in Group A — and within Group A, to put the kick on pad 1, snare on pad 2, hi-hats on pads 3 and 4. This mirrors the layout of hardware drum machines (Roland TR-series, etc.) and makes programming patterns feel intuitive. Groups B, C, and D are then free for bass, chords, and textures. You can also transfer samples from your computer via USB using Teenage Engineering's EP Sample Tool — useful for loading in specific sounds, loops, or breaks you've prepared in advance.</div>
+        </div>
+        <div class="block">
+          <div class="block-label">Suggested Pad Layout</div>
+          <div class="steps">
+            <div class="step"><div class="step-n">A</div><div class="step-body"><strong>Group A — Drums:</strong> Pad 1 = Kick, Pad 2 = Snare, Pad 3 = Closed Hat, Pad 4 = Open Hat, Pad 5 = Clap, Pads 6–12 = percussion, FX, additional hits.</div></div>
+            <div class="step"><div class="step-n">B</div><div class="step-body"><strong>Group B — Bass:</strong> Pads 1–12 = bass notes or bass one-shots arranged chromatically or by root note. Bass samples pitched across pads give you a playable bass instrument.</div></div>
+            <div class="step"><div class="step-n">C</div><div class="step-body"><strong>Group C — Chords / Melody:</strong> Sampled chords, stabs, vocal phrases, or melodic one-shots. One pad per sound or musical idea.</div></div>
+            <div class="step"><div class="step-n">D</div><div class="step-body"><strong>Group D — Textures / FX:</strong> Loops, ambience, risers, FX hits, anything that doesn't fit cleanly in A, B, or C. Use this group for colour and atmosphere.</div></div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Real-World Reference</div>
+          <div class="pattern-ref">
+            <div class="pattern-song">Discovery — Daft Punk (2001)</div>
+            <div class="pattern-meta">Virgin Records · French House / Electro · Various BPM</div>
+            <div class="pattern-notes">
+              "Discovery" was built by methodically assigning sampled elements across hardware — specific drum hits to specific pads, specific chord samples to specific keys, specific bass tones to specific triggers. Daft Punk's genius wasn't just in their sample choices but in their arrangement of those samples into a performable, improvable system. Every pad was a deliberate decision. "Digital Love," "Harder Better Faster Stronger," "Instant Crush" — all of them start with a well-organised set of samples on well-organised pads, then use sequencing and live performance to build something greater. Think about your pad layout as your instrument design — before a single note is played.
+            </div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Tip</div>
+          <div class="tip">
+            <div class="tip-icon">💡</div>
+            <div class="tip-body"><strong>Be consistent with your pad layout across projects.</strong> If kick is always pad 1 and snare is always pad 2, your hands learn the layout and you stop thinking about it. Muscle memory in pad position is one of the most valuable skills you can build — consistency is what creates it.</div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Watch Out</div>
+          <div class="watchout">
+            <div class="watchout-icon">⚠️</div>
+            <div class="watchout-body"><strong>Assigning a sample overwrites whatever was there.</strong> If you accidentally assign a new recording over a pad that had a sound you wanted to keep, press <span class="kbd">SHIFT</span> + <span class="kbd">Group B</span> immediately to undo. Beyond that, the previous assignment is gone. Make sure you're tapping the right pad before confirming an assignment.</div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Practice</div>
+          <div class="exercise">
+            <div class="exercise-eyebrow">Exercise 2.4</div>
+            <h4>Build a Full Drum Kit from Scratch</h4>
+            <p>Record and assign five drum sounds to Group A. Use only your hands and the built-in mic.</p>
+            <ul>
+              <li>Pad 1: record a kick — slap your chest or a desk for a low thud</li>
+              <li>Pad 2: record a snare — clap your hands sharply</li>
+              <li>Pad 3: record a closed hi-hat — click your tongue or tap two fingers together</li>
+              <li>Pad 4: record an open hi-hat — a longer version of the above with more room sound</li>
+              <li>Pad 5: record any percussion hit of your choice</li>
+              <li>Now build a 4-bar pattern using only these five samples — a complete beat, entirely from sounds you made yourself</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <hr class="lesson-divider"/>
+
+      <!-- 2.5 -->
+      <div class="lesson fade-up" id="m2-l5">
+        <div class="lesson-header">
+          <div class="lesson-eyebrow">Lesson 2.5</div>
+          <h2>Playback Modes &amp; Pitch</h2>
+          <p class="lesson-intro">Once a sample is on a pad, you have significant control over how it plays back. Pitch, loop mode, and one-shot vs. gate behaviour each change the creative possibilities of the same recording.</p>
+        </div>
+        <div class="block">
+          <div class="block-label">Explanation</div>
+          <div class="block-body">The EP-133 gives you several ways to control how a sample plays. In <strong>Sound Edit mode</strong> (hold <span class="kbd">SHIFT</span> + press <span class="kbd">SOUND</span>), you can adjust the pitch of each sample — useful for tuning a bass hit to a specific key, or detuning a sample for effect. You can also set whether the sample plays as a <strong>one-shot</strong> (plays fully regardless of how long you hold the pad) or a <strong>gate</strong> (plays only while the pad is held). One-shot is standard for drum hits; gate is useful for sustained sounds or vocals you want to control manually. The <strong>Keys mode</strong> lets you play a single sample chromatically across all 12 pads — turning any sample into a pitched instrument.</div>
+        </div>
+        <div class="block">
+          <div class="block-label">The Three Key Playback Controls</div>
+          <div class="steps">
+            <div class="step"><div class="step-n">1</div><div class="step-body"><strong>Pitch</strong> — in Sound Edit mode, Knob X adjusts pitch in semitones. Knob Y adjusts fine-tuning (cents). Use this to tune bass samples to your track's key, or to deliberately detune for texture.</div></div>
+            <div class="step"><div class="step-n">2</div><div class="step-body"><strong>One-shot vs Gate</strong> — one-shot plays the full sample on a single tap; gate plays only while the pad is held. Set per-pad in Sound Edit mode. A kick should almost always be one-shot. A sustained chord or vocal sample benefits from gate.</div></div>
+            <div class="step"><div class="step-n">3</div><div class="step-body"><strong>Keys mode</strong> (<span class="kbd">KEYS</span> button) — maps a single sample across all 12 pads in semitone steps. Tap pad 1 = root pitch, pad 2 = one semitone up, and so on. This turns any sample — a bass hit, a vocal snippet, a synth stab — into a fully playable melodic instrument.</div></div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Real-World Reference</div>
+          <div class="pattern-ref">
+            <div class="pattern-song">Homework — Daft Punk (1997)</div>
+            <div class="pattern-meta">Virgin Records · French House / Electronic · Various BPM</div>
+            <div class="pattern-notes">
+              Daft Punk's "Homework" is a clinic in pitch-shifted sampling. Tracks like "Da Funk" and "Rollin' &amp; Scratchin'" take single recorded sounds and pitch them, loop them, and layer them until they become something entirely new. "Around the World"'s bassline is a single sampled bass hit pitched chromatically across a sequence — the same sample, different pitches, creating melody. The EP-133's Keys mode lets you do this immediately: record one bass hit, enter Keys mode, and suddenly you have a 12-note bass instrument built from a single recording. This is a core technique — one sample, infinite musical material.
+            </div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Tip</div>
+          <div class="tip">
+            <div class="tip-icon">💡</div>
+            <div class="tip-body"><strong>Use Keys mode on everything, not just melodic samples.</strong> Try it on a drum hit — pitching a snare up creates a higher-pitched rimshot; pitching it down creates a deep, almost kick-like thud. A single recorded drum sound in Keys mode gives you an entire percussive instrument with 12 tonal variations. This is one of the fastest ways to add melodic interest to a drum-only pattern.</div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Watch Out</div>
+          <div class="watchout">
+            <div class="watchout-icon">⚠️</div>
+            <div class="watchout-body"><strong>Pitching a sample up stretches its perceived speed, pitching down stretches its length.</strong> A heavily pitched-up sample may sound thin and time-stretched; a pitched-down sample plays back slower and longer. This is especially noticeable on samples with distinct rhythmic content. Use Shift + Knob for fine-pitch adjustments to avoid large, unnatural-sounding shifts unless that's the effect you're going for.</div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Practice</div>
+          <div class="exercise">
+            <div class="exercise-eyebrow">Exercise 2.5</div>
+            <h4>One Sample, Three Instruments</h4>
+            <p>Record a single sound and use it three different ways. This demonstrates how much creative material lives inside a single recording.</p>
+            <ul>
+              <li>Record a bass-heavy sound — a deep hum, a chest thump, or a low vocal note</li>
+              <li>Assign it to pad 1 in Group B as a one-shot — play it in a pattern as a bass hit</li>
+              <li>Enter Keys mode — play a simple three-note melody using different pads. You now have a bass instrument.</li>
+              <li>Enter Sound Edit mode — pitch it up 7 semitones. Assign it to pad 5 in Group A. It's now a percussion sound.</li>
+              <li>Build a short pattern using all three versions simultaneously across groups A and B</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-module" onclick="switchModule('m3')">
+        <div>
+          <div class="next-up">Up Next — Module 03</div>
+          <div class="next-title">Beat Making &amp; Patterns</div>
+        </div>
+        <div class="next-arrow">→</div>
+      </div>
+
+    </main>
+  </div>
+</section>
+
+
+<!-- ██████████████████████████████████████████████████████
+     MODULE 03 — Beat Making & Patterns
+█████████████████████████████████████████████████████████ -->
+<section class="module-section m3" id="m3">
+
+  <div class="mod-hero m3-hero">
+    <div class="mod-tag">Module 03 of 06</div>
+    <h1>Beat Making<br/>&amp; Patterns</h1>
+    <p>You know the controls, you can sample. Now it's time to build actual music — using the sequencer's full range of recording modes, timing tools, and pattern techniques to go from loops to something that moves.</p>
+    <div class="mod-meta">
+      <div class="meta-item"><span class="meta-label">Lessons</span><span class="meta-val">5</span></div>
+      <div class="meta-item"><span class="meta-label">Focus</span><span class="meta-val">Sequencing · Timing · Groove</span></div>
+      <div class="meta-item"><span class="meta-label">Level</span><span class="meta-val">Intermediate</span></div>
+    </div>
+  </div>
+
+  <div class="page-body">
+    <aside class="sidebar m3" id="sidebar-m3">
+      <div class="sidebar-label">Lessons</div>
+      <a class="sidebar-link active" data-target="m3-l1"><span class="sidebar-num">3.1</span>Live Recording &amp; the Count-In</a>
+      <a class="sidebar-link" data-target="m3-l2"><span class="sidebar-num">3.2</span>Step Sequencing</a>
+      <a class="sidebar-link" data-target="m3-l3"><span class="sidebar-num">3.3</span>Timing, Quantise &amp; Swing</a>
+      <a class="sidebar-link" data-target="m3-l4"><span class="sidebar-num">3.4</span>Pattern Length &amp; Polyrhythm</a>
+      <a class="sidebar-link" data-target="m3-l5"><span class="sidebar-num">3.5</span>Note Repeat &amp; Fills</a>
+    </aside>
+
+    <main class="content m3">
+
+      <!-- 3.1 -->
+      <div class="lesson fade-up" id="m3-l1">
+        <div class="lesson-header">
+          <div class="lesson-eyebrow">Lesson 3.1</div>
+          <h2>Live Recording &amp; the Count-In</h2>
+          <p class="lesson-intro">Live recording is the fastest way to get ideas down. You play — the EP-133 captures. The four-beat count-in is your runway. Once you trust it, your recordings get tighter immediately.</p>
+        </div>
+        <div class="block">
+          <div class="block-label">Explanation</div>
+          <div class="block-body">The EP-133 has two ways to start recording. The first — holding <span class="kbd">RECORD</span> and tapping pads — drops you straight in with no count-in, useful for quick punch-ins over an existing pattern. The second — tapping <span class="kbd">RECORD</span> then <span class="kbd">PLAY</span> — gives you a four-beat count-in before recording begins. This is the one to use for laying down a new pattern from scratch. The count-in lets you find the tempo in your body before the first beat lands. Once the pattern is looping, every pass is an overdub — pads you play are added to what's already there. Press <span class="kbd">PLAY</span> to stop playback entirely, or press <span class="kbd">RECORD</span> alone to keep the loop running but exit record mode so you can listen back.</div>
+        </div>
+        <div class="block">
+          <div class="block-label">The Two Recording Modes</div>
+          <div class="steps">
+            <div class="step"><div class="step-n">1</div><div class="step-body"><strong>Count-in mode:</strong> tap <span class="kbd">RECORD</span>, then tap <span class="kbd">PLAY</span>. You'll hear four beats before recording starts. Best for recording a fresh pattern — gives your hands time to find the groove.</div></div>
+            <div class="step"><div class="step-n">2</div><div class="step-body"><strong>Instant punch-in:</strong> hold <span class="kbd">RECORD</span> and hit pads immediately. No count-in — notes record the moment you touch a pad. Best for adding a single element to a pattern that's already playing.</div></div>
+            <div class="step"><div class="step-n">3</div><div class="step-body"><strong>Exit record, keep playing:</strong> press <span class="kbd">RECORD</span> once while the loop is running. Recording stops, playback continues. You can now listen critically before deciding what to add next.</div></div>
+            <div class="step"><div class="step-n">4</div><div class="step-body"><strong>Stop everything:</strong> press <span class="kbd">PLAY</span>. Playback and recording both halt. The pattern is preserved exactly as it was when you stopped.</div></div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Real-World Reference</div>
+          <div class="pattern-ref">
+            <div class="pattern-song">Homework — Daft Punk (1997)</div>
+            <div class="pattern-meta">Virgin Records · French House · Various BPM</div>
+            <div class="pattern-notes">
+              Daft Punk have described their early recording process as loop-based and iterative — starting a groove, playing over it, then adding one element at a time until the track found its shape. Tracks like "Da Funk" and "Around the World" weren't built in one take; they were assembled pass by pass. The EP-133's overdub model — where each pass adds to the last — is exactly that workflow. Tap Record then Play, find your tempo in the count-in, play the kick. Listen. Punch in the snare. Listen again. This is how the music gets made: one layer at a time, judging each one before committing the next.
+            </div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Tip</div>
+          <div class="tip">
+            <div class="tip-icon">💡</div>
+            <div class="tip-body"><strong>Use the count-in to feel the tempo, not just count it.</strong> Don't use the four beats to mentally count "1-2-3-4." Use them to nod your head, tap your foot, let the BPM settle into your body. When the recording starts, your first hit should land naturally — not because you were counting, but because you felt when it was time.</div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Watch Out</div>
+          <div class="watchout">
+            <div class="watchout-icon">⚠️</div>
+            <div class="watchout-body"><strong>Every overdub pass adds — it doesn't replace.</strong> If you re-enter record mode on a pattern that already has notes, everything you play is layered on top. If you want to re-record a specific pad from scratch, hold <span class="kbd">ERASE</span> + tap that pad first to clear its notes, then punch in your new recording.</div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Practice</div>
+          <div class="exercise">
+            <div class="exercise-eyebrow">Exercise 3.1</div>
+            <h4>Three-Pass Build</h4>
+            <p>Build a complete groove using three separate recording passes with the count-in. No step sequencing — all live.</p>
+            <ul>
+              <li>Set BPM to 120. Tap Record then Play — use the count-in to feel the tempo.</li>
+              <li>Pass 1: record kick on every beat. Press Record to stop recording, listen to one full loop.</li>
+              <li>Pass 2: hold Record to punch in — add snare on beats 2 and 4. Exit record, listen.</li>
+              <li>Pass 3: count-in again — add hi-hats on the offbeats. Press Play to stop.</li>
+              <li>Listen to the result. Is the timing tight? If any element feels off, erase just that pad and re-record it.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <hr class="lesson-divider"/>
+
+      <!-- 3.2 -->
+      <div class="lesson fade-up" id="m3-l2">
+        <div class="lesson-header">
+          <div class="lesson-eyebrow">Lesson 3.2</div>
+          <h2>Step Sequencing</h2>
+          <p class="lesson-intro">Step sequencing is the other way in. Instead of playing in real time, you move through the pattern one step at a time and place notes exactly where you want them. Precise, methodical, and great for rhythms that are hard to play live.</p>
+        </div>
+        <div class="block">
+          <div class="block-label">Explanation</div>
+          <div class="block-body">In step sequencing mode, you navigate the pattern grid using <span class="kbd">–</span> and <span class="kbd">+</span> to move between steps, and hold <span class="kbd">RECORD</span> while tapping a pad to place a note at the current step position. The display shows your current step position as you move through the bar. This approach is slower than live recording but gives you surgical precision — perfect for programming syncopated rhythms, fast 32nd-note patterns, or anything where live timing is difficult. You can also use step mode to edit individual hits in an existing pattern: navigate to any step, then hold <span class="kbd">ERASE</span> + tap the pad to remove just that one hit, or hold <span class="kbd">RECORD</span> + tap to add one.</div>
+        </div>
+        <div class="block">
+          <div class="block-label">Step-by-Step</div>
+          <div class="steps">
+            <div class="step"><div class="step-n">1</div><div class="step-body">Stop playback. Press <span class="kbd">–</span> or <span class="kbd">+</span> to navigate to Step 1 — the display shows the current step position.</div></div>
+            <div class="step"><div class="step-n">2</div><div class="step-body">Hold <span class="kbd">RECORD</span> and tap a pad to place a note at the current step. Release <span class="kbd">RECORD</span>.</div></div>
+            <div class="step"><div class="step-n">3</div><div class="step-body">Press <span class="kbd">+</span> to move to the next step. Hold <span class="kbd">RECORD</span> + tap another pad (or the same pad) to place the next note.</div></div>
+            <div class="step"><div class="step-n">4</div><div class="step-body">Continue moving through the bar, placing notes step by step. Press <span class="kbd">PLAY</span> at any point to hear what you've built so far.</div></div>
+            <div class="step"><div class="step-n">5</div><div class="step-body">To remove a single note: navigate to its step, hold <span class="kbd">ERASE</span> + tap the pad. That specific hit is removed; everything else stays.</div></div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Real-World Reference</div>
+          <div class="pattern-ref">
+            <div class="pattern-song">Xtal — Aphex Twin (1992)</div>
+            <div class="pattern-meta">Apollo Records · Ambient Techno · 115 BPM</div>
+            <div class="pattern-grid">
+              <div class="beat-labels">
+                <div class="beat-label-pad"></div>
+                <div class="beat-label-nums">
+                  <div class="beat-num-group"><div class="beat-num downbeat">1</div><div class="beat-num">e</div><div class="beat-num">+</div><div class="beat-num">a</div></div>
+                  <div class="beat-num-group"><div class="beat-num downbeat">2</div><div class="beat-num">e</div><div class="beat-num">+</div><div class="beat-num">a</div></div>
+                  <div class="beat-num-group"><div class="beat-num downbeat">3</div><div class="beat-num">e</div><div class="beat-num">+</div><div class="beat-num">a</div></div>
+                  <div class="beat-num-group"><div class="beat-num downbeat">4</div><div class="beat-num">e</div><div class="beat-num">+</div><div class="beat-num">a</div></div>
+                </div>
+              </div>
+              <div class="pattern-row">
+                <div class="pattern-name">KICK</div>
+                <div class="pattern-steps">
+                  <div class="step-group"><div class="step-cell on"></div><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell on"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell on"></div><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell"></div><div class="step-cell on"></div><div class="step-cell"></div><div class="step-cell"></div></div>
+                </div>
+              </div>
+              <div class="pattern-row">
+                <div class="pattern-name">SNARE</div>
+                <div class="pattern-steps">
+                  <div class="step-group"><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell on"></div><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell on"></div><div class="step-cell"></div><div class="step-cell on-soft"></div><div class="step-cell"></div></div>
+                </div>
+              </div>
+            </div>
+            <div class="pattern-notes">
+              <strong>Kick: steps 1, 7, 9, 14 · Snare: steps 5, 13, 15 (ghost)</strong><br/>
+              "Xtal" uses an off-kilter kick pattern that resists the four-on-the-floor grid — hits landing on unexpected 16th-note positions create a feeling of gentle displacement that's hypnotic rather than disorienting. This kind of syncopation is extremely difficult to nail in live recording but trivial in step mode: navigate to step 7, place a kick. Navigate to step 14, place one there too. Step sequencing is how you access rhythms your hands can't reliably play.
+            </div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Tip</div>
+          <div class="tip">
+            <div class="tip-icon">💡</div>
+            <div class="tip-body"><strong>Combine live recording and step sequencing in the same pattern.</strong> Record the kick live for a natural feel, then switch to step mode to surgically add a syncopated snare hit or a 32nd-note fill that you couldn't play accurately in real time. The two approaches aren't mutually exclusive — use whichever is right for each element.</div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Watch Out</div>
+          <div class="watchout">
+            <div class="watchout-icon">⚠️</div>
+            <div class="watchout-body"><strong>Step position resets when you press Play.</strong> If you stop navigating steps and press Play to audition, the playhead returns to step 1 when you stop. Your step-edit position is not saved between plays — you'll need to navigate back to where you were using <span class="kbd">–</span> / <span class="kbd">+</span>.</div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Practice</div>
+          <div class="exercise">
+            <div class="exercise-eyebrow">Exercise 3.2</div>
+            <h4>Program a Syncopated Kick</h4>
+            <p>Use step mode to program a kick pattern that deliberately avoids the obvious four-on-the-floor grid. The goal is a pattern that still feels like it has forward motion but lands somewhere unexpected.</p>
+            <ul>
+              <li>Set timing to 1/16. Navigate to step 1 — place a kick.</li>
+              <li>Skip to step 3 — place a kick. (Already off the grid.)</li>
+              <li>Skip to step 9 — kick. Skip to step 13 — kick.</li>
+              <li>Press Play — how does this feel compared to the four-on-the-floor? More or less interesting?</li>
+              <li>Add a snare at step 5 and step 13 in step mode. Now play it with Group B bass notes live over the top.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <hr class="lesson-divider"/>
+
+      <!-- 3.3 -->
+      <div class="lesson fade-up" id="m3-l3">
+        <div class="lesson-header">
+          <div class="lesson-eyebrow">Lesson 3.3</div>
+          <h2>Timing, Quantise &amp; Swing</h2>
+          <p class="lesson-intro">Timing is where feel lives. Perfectly quantised patterns can sound lifeless. Unquantised ones can sound sloppy. The EP-133 gives you fine control over both — and a swing setting that splits the difference.</p>
+        </div>
+        <div class="block">
+          <div class="block-label">Explanation</div>
+          <div class="block-body">The <span class="kbd">TIMING</span> button controls two things: the note interval (how fine-grained the sequencer grid is) and whether quantise is on or off. Press <span class="kbd">TIMING</span> and turn <strong>Knob X</strong> to change the note interval — the default is 1/16, giving you 16 steps per bar. Moving to 1/32 doubles the resolution for finer edits; 1/8 gives you a coarser, faster grid. With quantise off, notes are recorded at their exact played timing — giving your pattern a human, slightly loose feel. With quantise on, every hit snaps to the nearest grid division. <strong>Timing Correct</strong> is the in-between: during playback, hold a pad while holding <span class="kbd">TIMING</span> to selectively quantise just that pad's notes — the display shows how many notes were corrected. Swing is applied via <strong>Knob Y</strong> in the timing menu and pushes every other 16th-note back slightly, creating the characteristic shuffle feel of classic drum machines.</div>
+        </div>
+        <div class="block">
+          <div class="block-label">Timing Controls</div>
+          <div class="steps">
+            <div class="step"><div class="step-n">1</div><div class="step-body"><strong>Note interval:</strong> press <span class="kbd">TIMING</span>, turn <strong>Knob X</strong>. Options: 1/1, 1/2, 1/4, 1/8, 1/8T, 1/16, 1/16T, 1/32. Start at 1/16 for most patterns.</div></div>
+            <div class="step"><div class="step-n">2</div><div class="step-body"><strong>Quantise on/off:</strong> press <span class="kbd">TIMING</span> to toggle. When on, live-recorded hits snap to the grid. When off, hits land at their exact played moment — including any early or late timing.</div></div>
+            <div class="step"><div class="step-n">3</div><div class="step-body"><strong>Timing Correct (selective quantise):</strong> during playback, hold <span class="kbd">TIMING</span> + hold a pad. The display counts how many notes on that pad were snapped to the grid. Release to apply.</div></div>
+            <div class="step"><div class="step-n">4</div><div class="step-body"><strong>Swing:</strong> press <span class="kbd">TIMING</span>, turn <strong>Knob Y</strong>. Increases the delay on every other 16th note. Low swing = tight. High swing = shuffled, triplet-like feel. Classic drum machine territory.</div></div>
+            <div class="step"><div class="step-n">5</div><div class="step-body"><strong>Nudge individual notes:</strong> while stopped, hold <span class="kbd">SHIFT</span> + a pad, then press <span class="kbd">–</span> / <span class="kbd">+</span> to nudge that note forward or back in ticks. Ticks are the smallest time unit on the EP-133 — finer than any note interval.</div></div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Real-World Reference</div>
+          <div class="pattern-ref">
+            <div class="pattern-song">Music Has the Right to Children — Boards of Canada (1998)</div>
+            <div class="pattern-meta">Warp Records · Electronic / Ambient · Various BPM</div>
+            <div class="pattern-notes">
+              Boards of Canada are famous for deliberately detuning their samples and slightly desynchronising their sequencer timing to create a feeling of memory and decay — music that sounds like it's being remembered rather than played. Their hi-hats often sit fractionally off the grid, their kicks feel slightly heavy rather than laser-precise. You don't need expensive tools to get this effect. On the EP-133: record with quantise off, then use Timing Correct to quantise only the kick (tightening the foundation) while leaving the hi-hats and snare with their natural human imprecision. The result sounds alive rather than mechanical.
+            </div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Tip</div>
+          <div class="tip">
+            <div class="tip-icon">💡</div>
+            <div class="tip-body"><strong>Swing between 54–62% is the sweet spot for most styles.</strong> Below 50% there's no swing. Above 66% it starts to sound lurching and overly shuffled. House music typically sits around 55–58%. Hip-hop grooves push toward 60–65%. Start at 55%, listen for a full 8 bars, and adjust from there — your ear will tell you when it's right.</div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Watch Out</div>
+          <div class="watchout">
+            <div class="watchout-icon">⚠️</div>
+            <div class="watchout-body"><strong>Swing affects the whole pattern, not individual pads.</strong> There's no per-pad swing setting — if you increase swing, every element in that group shifts. If you want your kick quantised tight but your hi-hat swung, you'll need to put them in separate groups and set swing differently per group, or nudge individual notes manually with Shift + pad + –/+.</div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Practice</div>
+          <div class="exercise">
+            <div class="exercise-eyebrow">Exercise 3.3</div>
+            <h4>Feel the Difference: Quantised vs Swung</h4>
+            <p>Build the same pattern three ways and listen to how timing changes the feel of identical notes.</p>
+            <ul>
+              <li>Record a kick/snare/hat pattern with quantise ON. Listen for 8 bars. Notice how mechanical it feels.</li>
+              <li>Erase all notes. Turn quantise OFF. Record the same pattern live — let your natural timing land. Listen for 8 bars. Notice where it feels loose or expressive.</li>
+              <li>Apply Timing Correct to just the kick pad (hold Timing + kick pad during playback). Listen — kick is now tight, other elements keep their feel.</li>
+              <li>Add swing at 56%. Listen again. Same notes, completely different groove.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <hr class="lesson-divider"/>
+
+      <!-- 3.4 -->
+      <div class="lesson fade-up" id="m3-l4">
+        <div class="lesson-header">
+          <div class="lesson-eyebrow">Lesson 3.4</div>
+          <h2>Pattern Length &amp; Polyrhythm</h2>
+          <p class="lesson-intro">Not everything has to be one bar. Longer patterns give you room to build evolving sequences. And because each group has its own independent length, the EP-133 naturally creates polyrhythmic tension that repeats on longer cycles.</p>
+        </div>
+        <div class="block">
+          <div class="block-label">Explanation</div>
+          <div class="block-body">By default, new patterns on the EP-133 are one bar long. To extend: hold <span class="kbd">RECORD</span> and press <span class="kbd">+</span> to add bars, one at a time. Each group can have a different pattern length — Group A's drums might loop every 2 bars, Group B's bassline every 4 bars, and Group C's chord stab every 3 bars. Because they're different lengths, they fall in and out of phase with each other, creating complex, shifting musical textures that don't repeat until all three lengths have completed a full common cycle. This is polyrhythm — and it's a powerful compositional tool that happens almost automatically on the EP-133 just by setting different lengths per group.</div>
+        </div>
+        <div class="block">
+          <div class="block-label">Setting Pattern Length</div>
+          <div class="steps">
+            <div class="step"><div class="step-n">1</div><div class="step-body">To extend a pattern: hold <span class="kbd">RECORD</span> + press <span class="kbd">+</span>. Each press adds one bar. The display shows the new length (e.g. <span class="kbd">Ln.2</span> = 2 bars).</div></div>
+            <div class="step"><div class="step-n">2</div><div class="step-body">To shorten: hold <span class="kbd">RECORD</span> + press <span class="kbd">–</span>. Notes recorded beyond the new end point are not deleted — they'll reappear if you extend the pattern again.</div></div>
+            <div class="step"><div class="step-n">3</div><div class="step-body">To set different lengths per group: select each group in turn (press Group A, B, C, D) and set its length independently using hold Record + +/–.</div></div>
+            <div class="step"><div class="step-n">4</div><div class="step-body"><strong>Polyrhythm example:</strong> Group A = 2 bars (drum loop), Group B = 3 bars (bass phrase), Group C = 4 bars (chord progression). They'll sync back to a shared downbeat every 12 bars — the pattern feels new for longer before it repeats.</div></div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Real-World Reference</div>
+          <div class="pattern-ref">
+            <div class="pattern-song">Kid A — Radiohead (2000)</div>
+            <div class="pattern-meta">Parlophone · Electronic / Art Rock · Various BPM</div>
+            <div class="pattern-notes">
+              Radiohead's "Kid A" was heavily influenced by the polyrhythmic sequencing of bands like Can and the minimalist composers — patterns of different lengths running simultaneously, falling in and out of phase with each other. "Everything in Its Right Place" uses a chord cycle that doesn't sync neatly with its underlying rhythm, creating a feeling of restless, floating movement. The EP-133 produces this naturally: set Group A to 2 bars, Group B to 3 bars, press Play and just listen. The patterns interact in ways you didn't compose deliberately — they find combinations you wouldn't have thought of. That's a feature, not a bug.
+            </div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Tip</div>
+          <div class="tip">
+            <div class="tip-icon">💡</div>
+            <div class="tip-body"><strong>Use a 2-bar drum pattern as your default.</strong> A single-bar drum loop repeats every bar and can start to feel robotic fast. A 2-bar pattern lets you put a variation in the second bar — an extra snare hit, a missing hi-hat, a ghost note — that makes the groove feel alive without needing complex programming. The difference between 1-bar and 2-bar drum patterns is enormous.</div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Watch Out</div>
+          <div class="watchout">
+            <div class="watchout-icon">⚠️</div>
+            <div class="watchout-body"><strong>If your bassline feels like it's cutting off early, check the pattern length.</strong> The most common cause of a bassline that stops before it finishes is that Group B's pattern length is still set to 1 bar but you recorded a phrase longer than that. Hold Record + press + to extend Group B's length until it matches your bassline's full phrase.</div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Practice</div>
+          <div class="exercise">
+            <div class="exercise-eyebrow">Exercise 3.4</div>
+            <h4>The 2+3 Polyrhythm</h4>
+            <p>Set up a deliberate polyrhythm between two groups and listen to what emerges.</p>
+            <ul>
+              <li>Group A: record a 2-bar drum loop (kick, snare, hats). Set length to 2 bars.</li>
+              <li>Group B: record a 3-bar bassline — a simple 3-note phrase that takes 3 bars to complete. Set length to 3 bars.</li>
+              <li>Press Play. Listen for 12+ bars — how long before the two patterns sync back to a shared downbeat?</li>
+              <li>Add Group C with a 4-bar chord pattern. Now the full repeat cycle is every 12 bars.</li>
+              <li>Notice which bar combinations feel like natural "drops" — those are your scene transition points.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <hr class="lesson-divider"/>
+
+      <!-- 3.5 -->
+      <div class="lesson fade-up" id="m3-l5">
+        <div class="lesson-header">
+          <div class="lesson-eyebrow">Lesson 3.5</div>
+          <h2>Note Repeat &amp; Fills</h2>
+          <p class="lesson-intro">Note Repeat is the EP-133's fastest tool for building energy. Hold a pad and the device fires it repeatedly at the current note interval — turning a single press into a hi-hat roll, a snare fill, or a rapid-fire melodic phrase.</p>
+        </div>
+        <div class="block">
+          <div class="block-label">Explanation</div>
+          <div class="block-body">Note Repeat is activated by holding <span class="kbd">TIMING</span> + holding a pad. While both are held, the device fires that pad repeatedly at the current timing interval. Switch timing to 1/16 for a straight 16th-note repeat. Switch to 1/8T (triplet) for a rolling, shuffled feel. Switch to 1/32 for a rapid fire effect on drops and fills. You can change the note interval while holding the pad — the repeat rate changes in real time. Combine this with the fader (controlling volume) for rolls that swell in and out. You can also latch note repeat: hold <span class="kbd">SHIFT</span> + <span class="kbd">TIMING</span> to lock it on, freeing both hands for other controls.</div>
+        </div>
+        <div class="block">
+          <div class="block-label">Using Note Repeat</div>
+          <div class="steps">
+            <div class="step"><div class="step-n">1</div><div class="step-body">Set your note interval: press <span class="kbd">TIMING</span> + Knob X. 1/16 is the standard starting point for hi-hat rolls.</div></div>
+            <div class="step"><div class="step-n">2</div><div class="step-body">Hold <span class="kbd">TIMING</span> + hold a pad. The device fires that pad at the current note interval for as long as you hold. Release either to stop.</div></div>
+            <div class="step"><div class="step-n">3</div><div class="step-body">While holding, change the interval in real time: press <span class="kbd">TIMING</span> + Knob X with your other hand. The repeat rate shifts immediately — ramp up to 1/32 for a fill that builds.</div></div>
+            <div class="step"><div class="step-n">4</div><div class="step-body"><strong>Latch mode:</strong> press <span class="kbd">SHIFT</span> + <span class="kbd">TIMING</span> to lock Note Repeat on. Now you can remove your hand from the pad — the repeat continues. Press <span class="kbd">SHIFT</span> + <span class="kbd">TIMING</span> again to unlock.</div></div>
+            <div class="step"><div class="step-n">5</div><div class="step-body"><strong>Record a fill:</strong> enter record mode and use Note Repeat to play a fill live — the repeated notes are captured into the pattern at their exact positions. This is the fastest way to program a 16th-note hi-hat roll.</div></div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Real-World Reference</div>
+          <div class="pattern-ref">
+            <div class="pattern-song">Get Lucky — Daft Punk ft. Pharrell Williams (2013)</div>
+            <div class="pattern-meta">Columbia Records · Funk / Disco / Electronic · 116 BPM</div>
+            <div class="pattern-grid">
+              <div class="beat-labels">
+                <div class="beat-label-pad"></div>
+                <div class="beat-label-nums">
+                  <div class="beat-num-group"><div class="beat-num downbeat">1</div><div class="beat-num">e</div><div class="beat-num">+</div><div class="beat-num">a</div></div>
+                  <div class="beat-num-group"><div class="beat-num downbeat">2</div><div class="beat-num">e</div><div class="beat-num">+</div><div class="beat-num">a</div></div>
+                  <div class="beat-num-group"><div class="beat-num downbeat">3</div><div class="beat-num">e</div><div class="beat-num">+</div><div class="beat-num">a</div></div>
+                  <div class="beat-num-group"><div class="beat-num downbeat">4</div><div class="beat-num">e</div><div class="beat-num">+</div><div class="beat-num">a</div></div>
+                </div>
+              </div>
+              <div class="pattern-row">
+                <div class="pattern-name">KICK</div>
+                <div class="pattern-steps">
+                  <div class="step-group"><div class="step-cell on"></div><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell on"></div><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div></div>
+                </div>
+              </div>
+              <div class="pattern-row">
+                <div class="pattern-name">SNARE</div>
+                <div class="pattern-steps">
+                  <div class="step-group"><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell on"></div><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell on"></div><div class="step-cell"></div><div class="step-cell"></div><div class="step-cell"></div></div>
+                </div>
+              </div>
+              <div class="pattern-row">
+                <div class="pattern-name">H.HAT</div>
+                <div class="pattern-steps">
+                  <div class="step-group"><div class="step-cell on"></div><div class="step-cell"></div><div class="step-cell on"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell on"></div><div class="step-cell"></div><div class="step-cell on"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell on"></div><div class="step-cell"></div><div class="step-cell on"></div><div class="step-cell"></div></div>
+                  <div class="step-group"><div class="step-cell on"></div><div class="step-cell on"></div><div class="step-cell on"></div><div class="step-cell on"></div></div>
+                </div>
+              </div>
+            </div>
+            <div class="pattern-notes">
+              <strong>Kick: 1, 9 · Snare: 5, 13 · Hi-hat: 8th notes with a 16th-note burst in beat 4</strong><br/>
+              "Get Lucky" uses a subtle hat acceleration in beat 4 of certain bars — a half-bar of 16th-note hats that briefly doubles the density before snapping back to 8ths. It's a fill technique borrowed from disco drumming and gives the groove its forward momentum. On the EP-133, this is exactly what Note Repeat is for: hold Timing + hat pad in the last beat of the bar, at 1/16 interval, to create this burst — recorded straight into the pattern.
+            </div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Tip</div>
+          <div class="tip">
+            <div class="tip-icon">💡</div>
+            <div class="tip-body"><strong>Pressure matters during Note Repeat.</strong> The EP-133's pads are velocity and pressure sensitive — how hard you hold the pad during Note Repeat controls the volume of each repeated hit. Press firmly for a loud, driving roll. Ease off for a ghost-note shimmer. Practice varying your pressure during a repeat for dynamic fills that don't all sound the same.</div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Watch Out</div>
+          <div class="watchout">
+            <div class="watchout-icon">⚠️</div>
+            <div class="watchout-body"><strong>Latch mode keeps firing even after you release the pad.</strong> If you activate latch and then forget about it, your pattern will keep adding repeated notes wherever the playhead is — potentially flooding a section you didn't intend to fill. Press <span class="kbd">SHIFT</span> + <span class="kbd">TIMING</span> again to unlock latch before moving to another section.</div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Practice</div>
+          <div class="exercise">
+            <div class="exercise-eyebrow">Exercise 3.5</div>
+            <h4>The One-Bar Fill</h4>
+            <p>Build a 2-bar pattern where bar 1 is your regular groove and bar 2 ends with a Note Repeat fill in the last beat.</p>
+            <ul>
+              <li>Record a standard kick/snare/hat groove — 2 bars, looping.</li>
+              <li>Enter record mode. In the last beat of bar 2, hold Timing + hi-hat pad at 1/16 for a 4-hit fill.</li>
+              <li>Exit record. Listen — the fill should kick in right before the loop returns to bar 1.</li>
+              <li>Now try the same fill at 1/32 — notice how it creates more tension and release.</li>
+              <li>Try the fill on a snare pad instead of hi-hat — a snare roll into the downbeat is a classic transition tool.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-module" onclick="switchModule('m4')">
+        <div>
+          <div class="next-up">Up Next — Module 04</div>
+          <div class="next-title">Effects &amp; Sound Design</div>
+        </div>
+        <div class="next-arrow">→</div>
+      </div>
+
+    </main>
+  </div>
+</section>
+<section class="module-section" id="m4">
+  <div class="mod-hero" style="min-height:60vh; display:flex; flex-direction:column; justify-content:center;">
+    <div class="mod-tag">Module 04 of 06</div>
+    <h1>Effects &amp;<br/>Sound Design</h1>
+    <p style="margin-top:16px; color:var(--soft); font-family:'DM Mono',monospace; font-size:0.75rem; letter-spacing:0.1em; text-transform:uppercase;">Coming soon</p>
+  </div>
+</section>
+<section class="module-section" id="m5">
+  <div class="mod-hero" style="min-height:60vh; display:flex; flex-direction:column; justify-content:center;">
+    <div class="mod-tag">Module 05 of 06</div>
+    <h1>Workflow Tips<br/>&amp; Tricks</h1>
+    <p style="margin-top:16px; color:var(--soft); font-family:'DM Mono',monospace; font-size:0.75rem; letter-spacing:0.1em; text-transform:uppercase;">Coming soon</p>
+  </div>
+</section>
+<section class="module-section" id="m6">
+  <div class="mod-hero" style="min-height:60vh; display:flex; flex-direction:column; justify-content:center;">
+    <div class="mod-tag">Module 06 of 06</div>
+    <h1>Song Arrangement<br/>&amp; Export</h1>
+    <p style="margin-top:16px; color:var(--soft); font-family:'DM Mono',monospace; font-size:0.75rem; letter-spacing:0.1em; text-transform:uppercase;">Coming soon</p>
+  </div>
+</section>
+
+
+<script>
+  /* ── MODULE SWITCHING ── */
+  function switchModule(id) {
+    // hide all sections
+    document.querySelectorAll('.module-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.mod-tab').forEach(t => t.classList.remove('active'));
+    // show target
+    document.getElementById(id).classList.add('active');
+    document.querySelector(`.mod-tab[data-mod="${id}"]`).classList.add('active');
+    // scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // re-init observers for new section
+    initSection(id);
+  }
+
+  document.querySelectorAll('.mod-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      if (tab.classList.contains('locked')) return;
+      switchModule(tab.dataset.mod);
+    });
+  });
+
+  /* ── SIDEBAR SCROLL LINKS ── */
+  document.querySelectorAll('.sidebar-link[data-target]').forEach(link => {
+    link.addEventListener('click', () => {
+      const el = document.getElementById(link.dataset.target);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
+  /* ── FADE-IN + SIDEBAR ACTIVE STATE ── */
+  function initSection(modId) {
+    const section = document.getElementById(modId);
+    if (!section) return;
+
+    // fade-up
+    const fades = section.querySelectorAll('.fade-up:not(.visible)');
+    const fadeObs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('visible'); fadeObs.unobserve(e.target); }
+      });
+    }, { threshold: 0.07 });
+    fades.forEach(el => fadeObs.observe(el));
+
+    // sidebar active
+    const sidebar = section.querySelector('.sidebar');
+    if (!sidebar) return;
+    const lessons = section.querySelectorAll('.lesson');
+    const links = sidebar.querySelectorAll('.sidebar-link');
+    const scrollObs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          links.forEach(l => l.classList.remove('active'));
+          const match = sidebar.querySelector(`.sidebar-link[data-target="${e.target.id}"]`);
+          if (match) match.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-20% 0px -65% 0px' });
+    lessons.forEach(l => scrollObs.observe(l));
+  }
+
+  // init the starting module
+  initSection('m1');
+</script>
+</body>
+</html>
