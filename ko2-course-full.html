@@ -72,8 +72,9 @@
     .mod-tag { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
     .m2 .mod-tag { color: var(--teal); }
     .mod-tag::before { content: ''; display: block; width: 18px; height: 2px; background: currentColor; }
-    .mod-hero h1 { font-family: 'Outfit', sans-serif; font-size: clamp(1.4rem, 2.5vw, 2.2rem); font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 14px; max-width: 600px; }
-    .mod-hero p { font-size: 0.95rem; color: var(--mid); line-height: 1.7; max-width: 520px; }
+    .mod-hero-body { display: flex; align-items: flex-start; gap: 48px; margin-bottom: 0; }
+    .mod-hero h1 { font-family: 'Outfit', sans-serif; font-size: clamp(1.4rem, 2.5vw, 2.2rem); font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; flex: 0 0 auto; max-width: 320px; }
+    .mod-hero p { font-size: 0.95rem; color: var(--mid); line-height: 1.7; flex: 1 1 0; align-self: center; max-width: 480px; }
     .mod-meta { display: flex; gap: 36px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--rule); flex-wrap: wrap; }
     .meta-item { display: flex; flex-direction: column; gap: 3px; }
     .meta-label { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--soft); }
@@ -188,6 +189,18 @@
       .top-nav { padding: 0 20px; }
       .mod-bar { padding: 0 20px; }
     }
+    /* ── TABLET (iPad) ── */
+    @media (max-width: 768px) {
+      .mod-hero-body { gap: 28px; }
+      .mod-hero h1 { font-size: 1.4rem; max-width: 260px; }
+      .mod-hero p { font-size: 0.88rem; }
+    }
+    /* ── PHONE (iPhone) ── */
+    @media (max-width: 480px) {
+      .mod-hero-body { flex-direction: column; gap: 12px; }
+      .mod-hero h1 { max-width: 100%; font-size: 1.3rem; }
+      .mod-hero p { font-size: 0.86rem; }
+    }
   </style>
 </head>
 <body>
@@ -219,8 +232,10 @@
 
   <div class="mod-hero m1-hero">
     <div class="mod-tag">Module 01 of 06</div>
-    <h1>Hardware Overview<br/>&amp; Core Patterns</h1>
-    <p>A fast map of the EP-133's controls, then straight into the essential drum patterns that built electronic music — translated directly to the device in front of you.</p>
+    <div class="mod-hero-body">
+      <h1>Hardware Overview<br/>&amp; Core Patterns</h1>
+      <p>A fast map of the EP-133's controls, then straight into the essential drum patterns that built electronic music — translated directly to the device in front of you.</p>
+    </div>
     <div class="mod-meta">
       <div class="meta-item"><span class="meta-label">Lessons</span><span class="meta-val">5</span></div>
       <div class="meta-item"><span class="meta-label">Focus</span><span class="meta-val">Controls · Patterns · Navigation</span></div>
@@ -601,8 +616,10 @@
 
   <div class="mod-hero m2-hero">
     <div class="mod-tag">Module 02 of 06</div>
-    <h1>Sampling<br/>Basics</h1>
-    <p>The EP-133 is a sampler before everything else. This module covers how sound gets in, how you shape it, and how it ends up on a pad — ready to be played.</p>
+    <div class="mod-hero-body">
+      <h1>Sampling<br/>Basics</h1>
+      <p>The EP-133 is a sampler before everything else. This module covers how sound gets in, how you shape it, and how it ends up on a pad — ready to be played.</p>
+    </div>
     <div class="mod-meta">
       <div class="meta-item"><span class="meta-label">Lessons</span><span class="meta-val">5</span></div>
       <div class="meta-item"><span class="meta-label">Focus</span><span class="meta-val">Recording · Trimming · Playback</span></div>
@@ -957,8 +974,10 @@
 
   <div class="mod-hero m3-hero">
     <div class="mod-tag">Module 03 of 06</div>
-    <h1>Beat Making<br/>&amp; Patterns</h1>
-    <p>You know the controls, you can sample. Now it's time to build actual music — using the sequencer's full range of recording modes, timing tools, and pattern techniques to go from loops to something that moves.</p>
+    <div class="mod-hero-body">
+      <h1>Beat Making<br/>&amp; Patterns</h1>
+      <p>You know the controls, you can sample. Now it's time to build actual music — using the sequencer's full range of recording modes, timing tools, and pattern techniques to go from loops to something that moves.</p>
+    </div>
     <div class="mod-meta">
       <div class="meta-item"><span class="meta-label">Lessons</span><span class="meta-val">5</span></div>
       <div class="meta-item"><span class="meta-label">Focus</span><span class="meta-val">Sequencing · Timing · Groove</span></div>
